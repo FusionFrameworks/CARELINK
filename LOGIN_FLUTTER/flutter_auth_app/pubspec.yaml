@@ -1,0 +1,38 @@
+name: flutter_auth_app
+description: "A new Flutter project for authentication."
+
+publish_to: 'none' # Prevent accidental publishing to pub.dev.
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # For HTTP requests to the backend API.
+  http: ^1.2.2
+
+  # To store the JWT token securely.
+  shared_preferences: ^2.1.1
+
+  # To handle JSON encoding and decoding.
+  json_annotation: ^4.7.0
+
+  # Cupertino Icons font for iOS style icons.
+  cupertino_icons: ^1.0.8
+  
+  # To pick images from gallery or camera.
+  image_picker: ^0.8.7+3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Recommended lints for good coding practices.
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
