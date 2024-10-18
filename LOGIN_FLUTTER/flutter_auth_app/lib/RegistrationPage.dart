@@ -24,14 +24,17 @@ class _RegistrationPageState extends State<RegistrationPage> {
   // Controllers for text fields
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final TextEditingController doctorNameController = TextEditingController();
-  final TextEditingController specializationController = TextEditingController();
+  final TextEditingController specializationController =
+      TextEditingController();
   final TextEditingController experienceController = TextEditingController();
   final TextEditingController hospitalNameController = TextEditingController();
 
   Future<void> submitRegistration() async {
-    if (_formKey2.currentState!.validate()) { // Use Step 2 form key
+    if (_formKey2.currentState!.validate()) {
+      // Use Step 2 form key
       if (password != confirmPassword) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Passwords do not match')),
@@ -79,7 +82,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   void nextPage() {
-    if (_formKey1.currentState!.validate()) { // Validate Step 1 form
+    if (_formKey1.currentState!.validate()) {
+      // Validate Step 1 form
       email = emailController.text;
       password = passwordController.text;
       confirmPassword = confirmPasswordController.text;
@@ -225,7 +229,8 @@ class Step1 extends StatelessWidget {
                 onNext();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 173, 221, 243), // Change to your desired color
+                backgroundColor: const Color.fromARGB(
+                    255, 173, 221, 243), // Change to your desired color
                 padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -343,7 +348,8 @@ class Step2 extends StatelessWidget {
                     onBack();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 173, 221, 243), // Change to your desired color
+                    backgroundColor: const Color.fromARGB(
+                        255, 173, 221, 243), // Change to your desired color
                     padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -356,7 +362,8 @@ class Step2 extends StatelessWidget {
                     onNext();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 173, 243, 175), // Change to your desired color
+                    backgroundColor: const Color.fromARGB(
+                        255, 173, 243, 175), // Change to your desired color
                     padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
