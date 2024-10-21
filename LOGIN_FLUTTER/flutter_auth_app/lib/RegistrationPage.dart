@@ -24,31 +24,31 @@ class _RegistrationPageState extends State<RegistrationPage> {
   // Controllers for text fields
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
   final TextEditingController doctorNameController = TextEditingController();
-  final TextEditingController specializationController =
-      TextEditingController();
+  final TextEditingController specializationController = TextEditingController();
   final TextEditingController experienceController = TextEditingController();
   final TextEditingController hospitalNameController = TextEditingController();
 
-  Future<void> submitRegistration() async {
-    if (_formKey2.currentState!.validate()) {
-      // Use Step 2 form key
-      if (password != confirmPassword) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Passwords do not match')),
-        );
-        return;
-      }
+ Future<void> submitRegistration() async {
+  if (_formKey2.currentState!.validate()) {
+    // Validate that passwords match
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
 
-      doctorName = doctorNameController.text;
-      specialization = specializationController.text;
-      experience = experienceController.text;
-      hospitalName = hospitalNameController.text;
+    // Prepare data to send to the server
+    doctorName = doctorNameController.text;
+    specialization = specializationController.text;
+    experience = experienceController.text;
+    hospitalName = hospitalNameController.text;
 
+    try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:3000/register'),
+        Uri.parse('http://10.0.2.2:3000/register'), // Update this with your server URL
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': email,
@@ -60,26 +60,41 @@ class _RegistrationPageState extends State<RegistrationPage> {
         }),
       );
 
+      // Debugging
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
 
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration successful')),
-        );
+      // Check the response from the server
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        var jsonResponse = json.decode(response.body);
+        if (jsonResponse['message'] == "User registered successfully") {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Registration successful')),
+          );
 
-        // Navigate to the Login Page after successful registration
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => LoginPage()),
-        );
+          // Navigate to the Login Page after successful registration
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginPage()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to register: ${jsonResponse['message']}')),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to register')),
+          SnackBar(content: Text('Failed to register: ${response.statusCode} - ${response.body}')),
         );
       }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to register: $e')),
+      );
     }
   }
+}
 
   void nextPage() {
     if (_formKey1.currentState!.validate()) {
@@ -229,8 +244,7 @@ class Step1 extends StatelessWidget {
                 onNext();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(
-                    255, 173, 221, 243), // Change to your desired color
+                backgroundColor: const Color.fromARGB(255, 173, 221, 243), // Change to your desired color
                 padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -309,7 +323,7 @@ class Step2 extends StatelessWidget {
             TextFormField(
               controller: experienceController,
               decoration: InputDecoration(
-                labelText: 'Experience',
+                labelText: 'Experience (years)',
                 border: OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Colors.blueAccent),
@@ -345,11 +359,10 @@ class Step2 extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    onBack();
+                    onBack(); // Call the back function
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(
-                        255, 173, 221, 243), // Change to your desired color
+                    backgroundColor: Colors.grey, // Change to your desired color
                     padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -359,11 +372,10 @@ class Step2 extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    onNext();
+                    onNext(); // Call the next function
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(
-                        255, 173, 243, 175), // Change to your desired color
+                    backgroundColor: const Color.fromARGB(255, 173, 221, 243), // Change to your desired color
                     padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

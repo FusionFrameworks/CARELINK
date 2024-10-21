@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 import 'dashboard.dart'; // Import the dashboard page here
+import 'doctor_profile_page.dart'; // Import the doctor profile page here
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final String apiUrl =
-      'http://10.0.2.2:3000/login'; // Update with your API URL
+  final String apiUrl = 'http://10.0.2.2:3000/login'; // Update with your API URL
 
   LoginPage({super.key});
 
@@ -30,34 +31,39 @@ class LoginPage extends StatelessWidget {
         body: json.encode({'email': email, 'password': password}),
       );
 
-      // Log the response status and body
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
+        
+        // Save user data to SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('email', responseData['email']);
+        await prefs.setString('doctorName', responseData['doctorName']);
+        await prefs.setString('specialization', responseData['specialization']);
+        await prefs.setInt('experience', responseData['experience']);
+        await prefs.setString('hospitalName', responseData['hospitalName']);
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login successful!')),
         );
 
-        // Guard the async gap by checking if the widget is still mounted
+        // Navigate to the doctor profile page after login
         if (context.mounted) {
-          // Navigate to the dashboard page after login
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => Dashboard()),
+            MaterialPageRoute(builder: (context) =>  Dashboard()),
           );
         }
       } else {
-        // Attempt to decode the error response body
-        print('Error Response: ${response.body}'); // Log the full response
+        print('Error Response: ${response.body}');
         try {
           final Map<String, dynamic> responseData = json.decode(response.body);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(responseData['message'] ?? 'Login failed')),
+            SnackBar(content: Text(responseData['error'] ?? 'Login failed')),
           );
         } catch (e) {
-          // If decoding fails, display a generic error message
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Login failed, please try again.')),
           );
