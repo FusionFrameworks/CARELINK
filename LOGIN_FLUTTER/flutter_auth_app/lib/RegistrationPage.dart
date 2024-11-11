@@ -253,6 +253,142 @@ class Step1 extends StatelessWidget {
               child: Text('Continue'),
             ),
           ],
+<<<<<<< HEAD
+=======
+        ),
+      ),
+    );
+  }
+}
+
+class Step2 extends StatelessWidget {
+  final Function onNext;
+  final Function onBack;
+  final TextEditingController doctorNameController;
+  final TextEditingController specializationController;
+  final TextEditingController experienceController;
+  final TextEditingController hospitalNameController;
+  final GlobalKey<FormState> formKey; // Add formKey parameter
+
+  Step2({
+    required this.onNext,
+    required this.onBack,
+    required this.doctorNameController,
+    required this.specializationController,
+    required this.experienceController,
+    required this.hospitalNameController,
+    required this.formKey, // Accept formKey
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Form(
+        key: formKey, // Assign the form key
+        child: Column(
+          children: [
+            TextFormField(
+              controller: doctorNameController,
+              decoration: InputDecoration(
+                labelText: 'Doctor Name',
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blueAccent),
+                ),
+              ),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter your name';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: specializationController,
+              decoration: InputDecoration(
+                labelText: 'Specialization',
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blueAccent),
+                ),
+              ),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter your specialization';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: experienceController,
+              decoration: InputDecoration(
+                labelText: 'Experience (years)',
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blueAccent),
+                ),
+              ),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter your experience';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 16),
+            TextFormField(
+              controller: hospitalNameController,
+              decoration: InputDecoration(
+                labelText: 'Hospital Name',
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.blueAccent),
+                ),
+              ),
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return 'Please enter your hospital name';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    onBack(); // Call the back function
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.grey, // Change to your desired color
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text('Back'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    onNext(); // Call the next function
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 173, 221, 243), // Change to your desired color
+                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text('Register'),
+                ),
+              ],
+            ),
+          ],
+>>>>>>> a4e6e8249b1e4cf88212e4e1add1be7382158ff8
         ),
       ),
     );

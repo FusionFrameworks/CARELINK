@@ -1,9 +1,16 @@
+<<<<<<< HEAD
 //UPDATED DOCTOR-PROFILE CODE
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+=======
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart'; // To store and retrieve user data
+>>>>>>> a4e6e8249b1e4cf88212e4e1add1be7382158ff8
 
 class DoctorProfile extends StatefulWidget {
   const DoctorProfile({super.key});
@@ -18,12 +25,15 @@ class _DoctorProfileState extends State<DoctorProfile> {
   String specialization = '';
   int experience = 0;
   String hospitalName = '';
+<<<<<<< HEAD
   bool isEditMode = false;
 
   final TextEditingController doctorNameController = TextEditingController();
   final TextEditingController specializationController = TextEditingController();
   final TextEditingController experienceController = TextEditingController();
   final TextEditingController hospitalNameController = TextEditingController();
+=======
+>>>>>>> a4e6e8249b1e4cf88212e4e1add1be7382158ff8
 
   @override
   void initState() {
@@ -32,6 +42,10 @@ class _DoctorProfileState extends State<DoctorProfile> {
   }
 
   Future<void> _loadUserProfile() async {
+<<<<<<< HEAD
+=======
+    // Fetch the user profile from shared preferences
+>>>>>>> a4e6e8249b1e4cf88212e4e1add1be7382158ff8
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       email = prefs.getString('email') ?? '';
@@ -39,6 +53,7 @@ class _DoctorProfileState extends State<DoctorProfile> {
       specialization = prefs.getString('specialization') ?? '';
       experience = prefs.getInt('experience') ?? 0;
       hospitalName = prefs.getString('hospitalName') ?? '';
+<<<<<<< HEAD
 
       // Initialize the text controllers with current profile data
       doctorNameController.text = doctorName;
@@ -83,6 +98,27 @@ class _DoctorProfileState extends State<DoctorProfile> {
     } catch (error) {
       print('Error updating profile: $error');
     }
+=======
+    });
+
+    // If you want to fetch the profile from the API instead, uncomment the following code
+    /*
+    final response = await http.get(Uri.parse('http://10.0.2.2:3000/profile'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> profileData = json.decode(response.body);
+      setState(() {
+        email = profileData['email'];
+        doctorName = profileData['doctorName'];
+        specialization = profileData['specialization'];
+        experience = profileData['experience'];
+        hospitalName = profileData['hospitalName'];
+      });
+    } else {
+      print('Failed to load profile: ${response.statusCode}');
+      // Handle error response
+    }
+    */
+>>>>>>> a4e6e8249b1e4cf88212e4e1add1be7382158ff8
   }
 
   @override
@@ -93,6 +129,7 @@ class _DoctorProfileState extends State<DoctorProfile> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
+<<<<<<< HEAD
             Navigator.pop(context);
           },
         ),
@@ -184,6 +221,51 @@ class _DoctorProfileState extends State<DoctorProfile> {
             ),
           ),
         ],
+=======
+            // Navigate back to the Dashboard page
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Doctor Name: $doctorName',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Email: $email',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Specialization: $specialization',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Experience: $experience years',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Hospital: $hospitalName',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                // Implement edit profile functionality if needed
+              },
+              child: const Text('Edit Profile'),
+            ),
+          ],
+        ),
+>>>>>>> a4e6e8249b1e4cf88212e4e1add1be7382158ff8
       ),
     );
   }
