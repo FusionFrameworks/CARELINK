@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema({
   hospitalName: { type: String, required: true },
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('Doctor', userSchema);
 
 // Login route
 app.post('/login', async (req, res) => {
@@ -139,6 +139,82 @@ app.put('/profile', async (req, res) => {
         hospitalName: updatedUser.hospitalName,
       }
     });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// Create LabTechnician schema and model
+const labTechnicianSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  technicianName: { type: String, required: true },
+  
+});
+
+const LabTechnician = mongoose.model('LabTechnician', labTechnicianSchema);
+
+// Lab Technician Login route
+app.post('/labtechnician/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    const technician = await LabTechnician.findOne({ email });
+    if (!technician) {
+      return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+    const isMatch = await bcrypt.compare(password, technician.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+    res.status(200).json({
+      email: technician.email,
+      technicianName: technician.technicianName,
+      department: technician.department,
+      experience: technician.experience,
+      labName: technician.labName,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Lab Technician Register route
+app.post('/labtechnician/register', async (req, res) => {
+  try {
+    console.log(req.body); // Log the request body to see if it's correct
+
+    const { email, password, technicianName } = req.body;
+
+    if (!email || !password || !technicianName) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    const existingTechnician = await LabTechnician.findOne({ email });
+    if (existingTechnician) {
+      return res.status(400).json({ error: 'Lab technician already exists' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newTechnician = new LabTechnician({
+      email,
+      password: hashedPassword,
+      technicianName,
+    });
+
+    await newTechnician.save();
+
+    res.status(201).json({ message: 'Lab technician registered successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });

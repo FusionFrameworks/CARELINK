@@ -1,7 +1,144 @@
+// import 'package:flutter/material.dart';
+// import 'login_page.dart';
+// import 'RegistrationPage.dart';
+// import 'splashscreen.dart';
+// import 'lab_technician_login.dart'; 
+// import 'lab_technician_register.dart';  // Import SplashScreen if in a separate file
+// import 'user_type_selection_page.dart';
+// void main() {
+//   runApp(const MyApp());
+// }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Flutter Auth App',
+//       initialRoute: '/splash', // Set initial route to splash
+//       routes: {
+        
+//         '/splash': (context) => const SplashScreen(),
+//         '/login': (context) => LoginPage(),
+//         '/register': (context) => RegistrationPage(),
+//           '/labtechnicianlogin': (context) => LabTechnicianLoginPage(),
+//     '/labtechnicianRegister': (context) => LabTechnicianRegistrationPage()
+//       },
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//         textTheme: const TextTheme(
+//           bodyMedium: TextStyle(
+//               fontSize: 16,
+//               color: Colors.black), // Replaced bodyText2 with bodyMedium
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// // SplashScreen class defined separately in splashscreen.dart
+// class SplashScreen extends StatefulWidget {
+//   const SplashScreen({super.key});
+
+//   @override
+//   _SplashScreenState createState() => _SplashScreenState();
+// }
+
+// class _SplashScreenState extends State<SplashScreen>
+//     with SingleTickerProviderStateMixin {
+//   late AnimationController _controller;
+//   late Animation<double> _opacityAnimation;
+//   late Animation<double> _scaleAnimation;
+
+//   @override
+//   void initState() {
+//     super.initState();
+
+//     // Animation controller to control the animation duration
+//     _controller = AnimationController(
+//       vsync: this,
+//       duration: const Duration(seconds: 3), // Animation lasts for 3 seconds
+//     );
+
+//     // Opacity animation from 0 (invisible) to 1 (fully visible)
+//     _opacityAnimation = Tween<double>(begin: 0, end: 1).animate(
+//       CurvedAnimation(parent: _controller, curve: Curves.easeIn),
+//     );
+
+//     // Scale animation: starts large, bounces, then settles
+//     _scaleAnimation = TweenSequence([
+//       // TweenSequenceItem(
+//       //   tween: Tween<double>(begin: 1.2, end: 1.2).chain(CurveTween(curve: Curves.easeOut)),
+//       //   weight: 50,
+//       // ),
+//       TweenSequenceItem(
+//         tween: Tween<double>(begin: 1.0, end: 1.5)
+//             .chain(CurveTween(curve: Curves.bounceOut)),
+//         weight: 50,
+//       ),
+//     ]).animate(_controller);
+
+//     // Start the animation
+//     _controller.forward();
+
+//     // Navigate to login after 3 seconds
+//     Future.delayed(const Duration(seconds: 3), () {
+//       Navigator.of(context).pushReplacementNamed('/login');
+//     });
+//   }
+
+//   @override
+//   void dispose() {
+//     _controller.dispose(); // Clean up the controller when done
+//     super.dispose();
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       body: Center(
+//         child: AnimatedBuilder(
+//           animation: _controller,
+//           builder: (context, child) {
+//             return Opacity(
+//               opacity: _opacityAnimation.value,
+//               child: Transform.scale(
+//                 scale: _scaleAnimation.value,
+//                 child: Column(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     const Text(
+//                       'Welcome to Care Link',
+//                       style:
+//                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+//                     ),
+//                     const SizedBox(height: 5), // Adjusted space
+//                     Image.asset('assets/doc.png',
+//                         width: 800), // Adjusted logo size
+//                   ],
+//                 ),
+//               ),
+//             );
+//           },
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
+
+
+
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'RegistrationPage.dart';
-import 'splashscreen.dart'; // Import SplashScreen if in a separate file
+import 'splashscreen.dart';
+import 'lab_technician_login.dart';
+import 'lab_technician_register.dart'; 
+import 'user_type_selection_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,11 +151,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Auth App',
-      initialRoute: '/splash', // Set initial route to splash
+      initialRoute: '/splash', 
+      // Set initial route to splash
       routes: {
         '/splash': (context) => const SplashScreen(),
         '/login': (context) => LoginPage(),
         '/register': (context) => RegistrationPage(),
+        '/labtechnicianlogin': (context) => LabTechnicianLoginPage(),
+        '/labtechnicianRegister': (context) => LabTechnicianRegistrationPage(),
+        '/userTypeSelection': (context) => const UserTypeSelectionPage(),
       },
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -63,10 +204,6 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Scale animation: starts large, bounces, then settles
     _scaleAnimation = TweenSequence([
-      // TweenSequenceItem(
-      //   tween: Tween<double>(begin: 1.2, end: 1.2).chain(CurveTween(curve: Curves.easeOut)),
-      //   weight: 50,
-      // ),
       TweenSequenceItem(
         tween: Tween<double>(begin: 1.0, end: 1.5)
             .chain(CurveTween(curve: Curves.bounceOut)),
@@ -77,9 +214,9 @@ class _SplashScreenState extends State<SplashScreen>
     // Start the animation
     _controller.forward();
 
-    // Navigate to login after 3 seconds
+    // Navigate to user type selection after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacementNamed('/login');
+      Navigator.of(context).pushReplacementNamed('/userTypeSelection');
     });
   }
 
