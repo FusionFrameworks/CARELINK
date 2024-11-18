@@ -220,6 +220,39 @@ app.post('/labtechnician/register', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+app.put('/labtechnician/profile', async (req, res) => {
+  try {
+    const { email, name, password } = req.body;
+
+    // Validate email presence (email is assumed to be the unique identifier)
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    // Find the Lab Technician by email and update the fields
+    const updatedLabTechnician = await LabTechnician.findOneAndUpdate(
+      { email },
+      {  password },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedLabTechnician) {
+      return res.status(404).json({ error: 'Lab Technician not found' });
+    }
+
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      labTechnician: {
+        email: updatedLabTechnician.email,
+        password: '******' // Mask the password in the response for security
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 
 // Start the server
 const PORT = process.env.PORT || 3000;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dashboard.dart'; // Import the dashboard page here (or update the navigation page accordingly)
+import 'labtechniciandashboard.dart'; // Import the dashboard page here (or update the navigation page accordingly)
 
 class LabTechnicianLoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -48,7 +48,7 @@ class LabTechnicianLoginPage extends StatelessWidget {
         if (context.mounted) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => Dashboard()), // Update this with the target page
+            MaterialPageRoute(builder: (context) => LabTechnicianDashboard()), // Update this with the target page
           );
         }
       } else {
