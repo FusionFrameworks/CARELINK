@@ -12,7 +12,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // Connect to MongoDB (Replace the connection string with your MongoDB URL)
-mongoose.connect('mongodb+srv://rakshitharakshitha6242:raksh@cluster0.rdl2otz.mongodb.net/carelink', {
+mongoose.connect('mongodb+srv://ashish:goswami@cluster0.trds1g8.mongodb.net/carelink', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => {

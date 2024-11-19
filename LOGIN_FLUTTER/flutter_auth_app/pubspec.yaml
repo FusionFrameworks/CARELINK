@@ -27,6 +27,9 @@ dependencies:
   # To pick images from gallery or camera.
   image_picker: ^0.8.7+3
 
+  # For date and time formatting.
+  intl: ^0.18.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

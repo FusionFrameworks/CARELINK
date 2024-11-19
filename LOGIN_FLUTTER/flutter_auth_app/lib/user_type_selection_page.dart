@@ -11,42 +11,84 @@ class UserTypeSelectionPage extends StatelessWidget {
         centerTitle: true,
       ),
       body: Center(
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             // Doctor Button
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Navigate to doctor login page
-                    Navigator.pushNamed(context, '/login');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    textStyle: const TextStyle(fontSize: 18),
-                    backgroundColor: Colors.white, // Use backgroundColor instead of primary
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: MouseRegion(
+                onEnter: (_) {
+                  // Handle hover enter
+                },
+                onExit: (_) {
+                  // Handle hover exit
+                },
+                child: SizedBox(
+                  width: 200, // Fixed width
+                  height: 60, // Fixed height
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navigate to doctor login page
+                      Navigator.pushNamed(context, '/login');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ).copyWith(
+                      backgroundColor: MaterialStateProperty.resolveWith((states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.blue[200]; // Hover effect
+                        }
+                        return Colors.white; // Default color
+                      }),
+                    ),
+                    child: const Text('Doctor'),
                   ),
-                  child: const Text('Doctor'),
                 ),
               ),
             ),
             // Lab Technician Button
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    // Navigate to lab technician login page
-                    Navigator.pushNamed(context, '/labtechnicianlogin');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    textStyle: const TextStyle(fontSize: 18),
-                    backgroundColor: Colors.white, // Use backgroundColor instead of primary
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: MouseRegion(
+                onEnter: (_) {
+                  // Handle hover enter
+                },
+                onExit: (_) {
+                  // Handle hover exit
+                },
+                child: SizedBox(
+                  width: 200, // Fixed width
+                  height: 60, // Fixed height
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navigate to lab technician login page
+                      Navigator.pushNamed(context, '/labtechnicianlogin');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black,
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ).copyWith(
+                      backgroundColor: MaterialStateProperty.resolveWith((states) {
+                        if (states.contains(MaterialState.hovered)) {
+                          return Colors.blue[200]; // Hover effect
+                        }
+                        return Colors.white; // Default color
+                      }),
+                    ),
+                    child: const Text('Lab Technician'),
                   ),
-                  child: const Text('Lab Technician'),
                 ),
               ),
             ),
