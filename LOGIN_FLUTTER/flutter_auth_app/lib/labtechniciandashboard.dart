@@ -4,14 +4,15 @@ import 'technician_profile.dart';
 class LabTechnicianDashboard extends StatelessWidget {
   const LabTechnicianDashboard({super.key});
 
-  Future<void> _logout(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+ Future<void> _logout(BuildContext context) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
 
-    if (context.mounted) {
-      Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-    }
+  if (context.mounted) {
+    Navigator.pushNamedAndRemoveUntil(context, '/userTypeSelection', (route) => false);
   }
+}
+
 
   void _uploadLabReport() {
     print("Upload Lab Report clicked");

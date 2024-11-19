@@ -25,51 +25,76 @@
 //   }
 
 //   Future<void> _loadUserProfile() async {
-//     SharedPreferences prefs = await SharedPreferences.getInstance();
-//     setState(() {
-//       email = prefs.getString('email') ?? '';
-//       password = prefs.getString('password') ?? '';
+//     try {
+//       SharedPreferences prefs = await SharedPreferences.getInstance();
+//       setState(() {
+//         email = prefs.getString('email') ?? '';
+//         password = prefs.getString('password') ?? '';
 
-//       // Initialize the text controllers with current profile data
-//       emailController.text = email;
-//       passwordController.text = password;
-//     });
+//         emailController.text = email;
+//         passwordController.text = password;
+//       });
+//     } catch (error) {
+//       print('Error loading user profile: $error');
+//     }
 //   }
 
 //   Future<void> _updateUserProfile() async {
-//     try {
-//       final response = await http.put(
-//         Uri.parse('http://10.0.2.2:3000/labtechnician/profile'), // Ensure the URL is correct
-//         headers: {'Content-Type': 'application/json'},
-//         body: json.encode({
-//           'email': emailController.text,
-//           'password': passwordController.text,
-//         }),
+//   if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       const SnackBar(content: Text('Email and password cannot be empty.')),
+//     );
+//     return;
+//   }
+
+//   try {
+//     print('Updating profile...');
+//     print('Email: ${emailController.text}');
+//     print('Password: ${passwordController.text}');
+
+//     final response = await http.put(
+//       Uri.parse('http://10.0.2.2:3000/labtechnician/profile'),
+//       headers: {'Content-Type': 'application/json'},
+//       body: json.encode({
+//         'currentEmail': email, // Pass current email for identification
+//         'email': emailController.text,
+//         'password': passwordController.text,
+//       }),
+//     );
+
+//     print("API Response Status Code: ${response.statusCode}");
+//     print("API Response Body: ${response.body}");
+
+//     if (response.statusCode == 200) {
+//       SharedPreferences prefs = await SharedPreferences.getInstance();
+//       prefs.setString('email', emailController.text); // Update email
+//       prefs.setString('password', passwordController.text); // Update password
+
+//       setState(() {
+//         email = emailController.text;
+//         password = passwordController.text;
+//         isEditMode = false;
+//       });
+
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text('Profile updated successfully!')),
 //       );
 
-//       print("API Response Status Code: ${response.statusCode}");
-
-//       if (response.statusCode == 200) {
-//         // Update SharedPreferences with new data
-//         SharedPreferences prefs = await SharedPreferences.getInstance();
-//         prefs.setString('email', emailController.text);
-//         prefs.setString('password', passwordController.text);
-
-//         setState(() {
-//           email = emailController.text;
-//           password = passwordController.text;
-//           isEditMode = false; // Exit edit mode
-//         });
-
-//         // Navigate back to the previous screen
-//         Navigator.pop(context);
-//       } else {
-//         print('Failed to update profile: ${response.statusCode}');
-//       }
-//     } catch (error) {
-//       print('Error updating profile: $error');
+//       Navigator.pop(context);
+//     } else {
+//       print('Failed to update profile. Response: ${response.body}');
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Failed to update profile. Error: ${response.body}')),
+//       );
 //     }
+//   } catch (error) {
+//     print('Error updating profile: $error');
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       const SnackBar(content: Text('Error updating profile. Please try again.')),
+//     );
 //   }
+// }
+
 
 //   @override
 //   Widget build(BuildContext context) {
@@ -79,21 +104,21 @@
 //         leading: IconButton(
 //           icon: const Icon(Icons.arrow_back),
 //           onPressed: () {
-//             Navigator.pop(context); // Navigate back when the back button is pressed
+//             Navigator.pop(context);
 //           },
 //         ),
 //         actions: [
 //           if (isEditMode)
 //             IconButton(
 //               icon: const Icon(Icons.check),
-//               onPressed: _updateUserProfile, // Update profile and navigate back
+//               onPressed: _updateUserProfile,
 //             )
 //           else
 //             IconButton(
 //               icon: const Icon(Icons.edit),
 //               onPressed: () {
 //                 setState(() {
-//                   isEditMode = true; // Enter edit mode
+//                   isEditMode = true;
 //                 });
 //               },
 //             ),
@@ -173,6 +198,9 @@
 
 
 
+
+
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -188,10 +216,14 @@ class LabTechnicianProfile extends StatefulWidget {
 class _LabTechnicianProfileState extends State<LabTechnicianProfile> {
   String email = '';
   String password = '';
+  String technicianName = '';
+  String report = '';
   bool isEditMode = false;
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController technicianNameController = TextEditingController();
+  final TextEditingController reportController = TextEditingController();
 
   @override
   void initState() {
@@ -205,9 +237,13 @@ class _LabTechnicianProfileState extends State<LabTechnicianProfile> {
       setState(() {
         email = prefs.getString('email') ?? '';
         password = prefs.getString('password') ?? '';
+        technicianName = prefs.getString('technicianName') ?? '';
+        report = prefs.getString('report') ?? '';
 
         emailController.text = email;
         passwordController.text = password;
+        technicianNameController.text = technicianName;
+        reportController.text = report;
       });
     } catch (error) {
       print('Error loading user profile: $error');
@@ -215,60 +251,68 @@ class _LabTechnicianProfileState extends State<LabTechnicianProfile> {
   }
 
   Future<void> _updateUserProfile() async {
-  if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Email and password cannot be empty.')),
-    );
-    return;
-  }
-
-  try {
-    print('Updating profile...');
-    print('Email: ${emailController.text}');
-    print('Password: ${passwordController.text}');
-
-    final response = await http.put(
-      Uri.parse('http://10.0.2.2:3000/labtechnician/profile'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'currentEmail': email, // Pass current email for identification
-        'email': emailController.text,
-        'password': passwordController.text,
-      }),
-    );
-
-    print("API Response Status Code: ${response.statusCode}");
-    print("API Response Body: ${response.body}");
-
-    if (response.statusCode == 200) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('email', emailController.text);
-      prefs.setString('password', passwordController.text);
-
-      setState(() {
-        email = emailController.text;
-        password = passwordController.text;
-        isEditMode = false;
-      });
-
+    if (emailController.text.isEmpty || passwordController.text.isEmpty || technicianNameController.text.isEmpty || reportController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully!')),
+        const SnackBar(content: Text('All fields are required.')),
+      );
+      return;
+    }
+
+    try {
+      print('Updating profile...');
+      print('Email: ${emailController.text}');
+      print('Password: ${passwordController.text}');
+      print('Technician Name: ${technicianNameController.text}');
+      print('Report: ${reportController.text}');
+
+      final response = await http.put(
+        Uri.parse('http://10.0.2.2:3000/labtechnician/profile'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'currentEmail': email, // Pass current email for identification
+          'email': emailController.text,
+          'password': passwordController.text,
+          'technicianName': technicianNameController.text,
+          'report': reportController.text,
+        }),
       );
 
-      Navigator.pop(context);
-    } else {
-      print('Failed to update profile. Response: ${response.body}');
+      print("API Response Status Code: ${response.statusCode}");
+      print("API Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('email', emailController.text); // Update email
+        prefs.setString('password', passwordController.text); // Update password
+        prefs.setString('technicianName', technicianNameController.text); // Update technician name
+        prefs.setString('report', reportController.text); // Update report
+
+        setState(() {
+          email = emailController.text;
+          password = passwordController.text;
+          technicianName = technicianNameController.text;
+          report = reportController.text;
+          isEditMode = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile updated successfully!')),
+        );
+
+        Navigator.pop(context);
+      } else {
+        print('Failed to update profile. Response: ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update profile. Error: ${response.body}')),
+        );
+      }
+    } catch (error) {
+      print('Error updating profile: $error');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update profile. Error: ${response.body}')),
+        const SnackBar(content: Text('Error updating profile. Please try again.')),
       );
     }
-  } catch (error) {
-    print('Error updating profile: $error');
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Error updating profile. Please try again.')),
-    );
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -311,6 +355,8 @@ class _LabTechnicianProfileState extends State<LabTechnicianProfile> {
       children: [
         _buildProfileRow('Email', email),
         _buildProfileRow('Password', password),
+        _buildProfileRow('Technician Name', technicianName),
+        _buildProfileRow('Report', report),
       ],
     );
   }
@@ -321,6 +367,8 @@ class _LabTechnicianProfileState extends State<LabTechnicianProfile> {
       children: [
         _buildEditableRow('Email', emailController),
         _buildEditableRow('Password', passwordController),
+        _buildEditableRow('Technician Name', technicianNameController),
+        _buildEditableRow('Report', reportController),
       ],
     );
   }

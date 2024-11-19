@@ -133,7 +133,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Registration Page'),
+        title: Text('Doctor Registration'),
       ),
       body: PageView(
         controller: _pageController,

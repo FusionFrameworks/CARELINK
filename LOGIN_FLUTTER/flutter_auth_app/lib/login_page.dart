@@ -80,7 +80,7 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login'),
+        title: const Text('Doctor Login'),
       ),
       body: Center(
         child: Padding(
