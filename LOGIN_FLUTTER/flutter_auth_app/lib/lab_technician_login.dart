@@ -7,7 +7,7 @@ import 'labtechniciandashboard.dart'; // Import the dashboard page here (or upda
 class LabTechnicianLoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final String apiUrl = 'http://10.0.2.2:3000/labtechnician/login'; // Update with your API URL
+  final String apiUrl = 'http://10.0.2.2:3000/labtechnicians/login'; // Update with your API URL
 
   LabTechnicianLoginPage({super.key});
 

@@ -1,24 +1,37 @@
-import 'dart:convert';
 import 'dart:io';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
+import 'technician_profile.dart';
 
 class LabTechnicianDashboard extends StatefulWidget {
-  const LabTechnicianDashboard({Key? key}) : super(key: key);
+  const LabTechnicianDashboard({super.key});
 
   @override
-  State<LabTechnicianDashboard> createState() => _LabTechnicianDashboardState();
+  _LabTechnicianDashboardState createState() => _LabTechnicianDashboardState();
 }
 
 class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
   List<Map<String, dynamic>> reports = [];
 
-  // Fetch reports from the backend
+  Future<void> _logout(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+
+    if (context.mounted) {
+      Navigator.pushNamedAndRemoveUntil(
+        context, 
+        '/userTypeSelection', 
+        (route) => false,
+      );
+    }
+  }
+
   Future<void> _fetchReports() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.228.62:3000/reports'));
+      final response = await http.get(Uri.parse('http://192.168.173.155:3000/reports'));
       if (response.statusCode == 200) {
         final List fetchedReports = jsonDecode(response.body);
         setState(() {
@@ -43,7 +56,6 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
     }
   }
 
-  // Upload Lab report
   Future<void> _uploadLabReport() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
@@ -56,7 +68,7 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
       try {
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('http://192.168.228.62:3000/upload'),
+          Uri.parse('http://192.168.173.155:3000/upload'),
         );
         request.files.add(await http.MultipartFile.fromPath('labReport', file.path));
 
@@ -79,10 +91,9 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
     }
   }
 
-  // Delete report by ID
   Future<void> _deleteReport(String id) async {
     try {
-      final response = await http.delete(Uri.parse('http://192.168.228.62:3000/reports/$id'));
+      final response = await http.delete(Uri.parse('http://192.168.173.155:3000/reports/$id'));
       if (response.statusCode == 200) {
         setState(() {
           reports.removeWhere((report) => report['id'] == id);
@@ -102,6 +113,10 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
     }
   }
 
+  void _editProfile(BuildContext context) {
+    Navigator.pushNamed(context, '/LabTechnicianProfile');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -113,86 +128,76 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lab Technician Dashboard'),
-        backgroundColor: Colors.teal,
-        elevation: 0,
       ),
       body: Column(
         children: [
-          // Upload Button
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: ElevatedButton.icon(
-              onPressed: _uploadLabReport,
-              icon: const Icon(Icons.upload_file),
-              label: const Text("Upload Lab Report"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal,
-                foregroundColor: Colors.white,
-              ),
-            ),
+          ElevatedButton(
+            onPressed: _uploadLabReport,
+            child: const Text('Upload Lab Report'),
           ),
           const SizedBox(height: 10),
           Expanded(
-            child: Container(
-              color: Colors.grey[200],
-              child: reports.isEmpty
-                  ? const Center(child: CircularProgressIndicator())
-                  : ListView.builder(
-                      itemCount: reports.length,
-                      itemBuilder: (context, index) {
-                        final report = reports[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          child: Card(
-                            elevation: 3,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                              leading: const Icon(
-                                Icons.picture_as_pdf,
-                                color: Colors.red,
-                                size: 40,
-                              ),
-                              title: Text(
-                                report['fileName'],
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              subtitle: Text(
-                                'Uploaded on: ${report['uploadDate']}',
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.download, color: Colors.teal),
-                                    onPressed: report['filePath'].isNotEmpty
-                                        ? () {
-                                            // Handle download logic
-                                            print('Download: ${report['filePath']}');
-                                          }
-                                        : null,
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () {
-                                      _deleteReport(report['id']);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      },
+            child: ListView.builder(
+              itemCount: reports.length,
+              itemBuilder: (context, index) {
+                final report = reports[index];
+                return Card(
+                  child: ListTile(
+                    title: Text(report['fileName']),
+                    subtitle: Text('Uploaded on: ${report['uploadDate']}'),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () => _deleteReport(report['id']),
                     ),
+                  ),
+                );
+              },
             ),
           ),
         ],
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Icon(Icons.person, size: 50, color: Colors.white),
+                  SizedBox(height: 10),
+                  Text(
+                    'Lab Technician',
+                    style: TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Edit Profile'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LabTechnicianProfile(),
+                  ),
+                ); // Navigate to the Profile Page
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
+              onTap: () => _logout(context),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
+
