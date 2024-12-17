@@ -17,15 +17,35 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
   List<Map<String, dynamic>> reports = [];
 
   Future<void> _logout(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    bool? confirmLogout = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout Confirmation'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Logout'),
+          ),
+        ],
+      ),
+    );
 
-    if (context.mounted) {
-      Navigator.pushNamedAndRemoveUntil(
-        context, 
-        '/userTypeSelection', 
-        (route) => false,
-      );
+    if (confirmLogout == true) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      if (context.mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+          context, 
+          '/userTypeSelection', 
+          (route) => false,
+        );
+      }
     }
   }
 
@@ -64,6 +84,7 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
 
     if (result != null) {
       File file = File(result.files.single.path!);
+      String fileName = result.files.single.name;
 
       try {
         var request = http.MultipartRequest(
@@ -75,17 +96,17 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
         var response = await request.send();
         if (response.statusCode == 200) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('File uploaded successfully')),
+            SnackBar(content: Text('File "$fileName" uploaded successfully')),
           );
           _fetchReports(); // Refresh reports after uploading
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to upload file')),
+            SnackBar(content: Text('Failed to upload "$fileName"')),
           );
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error uploading file: $e')),
+          SnackBar(content: Text('Error uploading "$fileName": $e')),
         );
       }
     }
@@ -99,7 +120,7 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
           reports.removeWhere((report) => report['id'] == id);
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Report deleted successfully.')),
+          const SnackBar(content: Text('Report deleted successfully.')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -180,14 +201,7 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
             ListTile(
               leading: const Icon(Icons.edit),
               title: const Text('Edit Profile'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LabTechnicianProfile(),
-                  ),
-                ); // Navigate to the Profile Page
-              },
+              onTap: () => _editProfile(context),
             ),
             ListTile(
               leading: const Icon(Icons.logout),
