@@ -35,7 +35,7 @@ class _LabTechnicianRegistrationPageState
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:3000/labtechnicians/register'),
+        Uri.parse('https://l7xqlqhl-3000.inc1.devtunnels.ms/labtechnicians/register'),    //http://10.0.2.2:3000/labtechnicians/register
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': email,

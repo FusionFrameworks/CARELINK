@@ -51,7 +51,7 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
 
   Future<void> _fetchReports() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.173.155:3000/reports'));
+      final response = await http.get(Uri.parse('https://l7xqlqhl-3000.inc1.devtunnels.ms/reports')); //replace with ipadress to run on local
       if (response.statusCode == 200) {
         final List fetchedReports = jsonDecode(response.body);
         setState(() {
@@ -89,7 +89,7 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
       try {
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse('http://192.168.173.155:3000/upload'),
+          Uri.parse('https://l7xqlqhl-3000.inc1.devtunnels.ms/upload'),  //replace with ipadress to run on local
         );
         request.files.add(await http.MultipartFile.fromPath('labReport', file.path));
 
@@ -114,7 +114,7 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
 
   Future<void> _deleteReport(String id) async {
     try {
-      final response = await http.delete(Uri.parse('http://192.168.173.155:3000/reports/$id'));
+      final response = await http.delete(Uri.parse('https://l7xqlqhl-3000.inc1.devtunnels.ms/reports/$id'));  //replace with ipadress to run on local
       if (response.statusCode == 200) {
         setState(() {
           reports.removeWhere((report) => report['id'] == id);

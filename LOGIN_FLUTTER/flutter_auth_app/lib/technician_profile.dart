@@ -53,7 +53,7 @@ class _LabTechnicianProfileState extends State<LabTechnicianProfile> {
       print('Technician Name: ${technicianNameController.text}');
 
       final response = await http.put(
-        Uri.parse('http://10.0.2.2:3000/labtechnician/profile'),
+        Uri.parse('https://l7xqlqhl-3000.inc1.devtunnels.ms/labtechnician/profile'),  //http://10.0.2.2:3000/labtechnician/profile
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'currentEmail': email, // Pass current email for identification

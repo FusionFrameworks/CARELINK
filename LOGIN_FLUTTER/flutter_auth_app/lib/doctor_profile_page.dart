@@ -51,7 +51,7 @@ class _DoctorProfileState extends State<DoctorProfile> {
   Future<void> _updateUserProfile() async {
     try {
       final response = await http.put(
-        Uri.parse('http://10.0.2.2:3000/profile'), // Adjust URL as needed
+        Uri.parse('https://l7xqlqhl-3000.inc1.devtunnels.ms/profile'), // Adjust URL as needed   //http://10.0.2.2:3000/profile
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': email,

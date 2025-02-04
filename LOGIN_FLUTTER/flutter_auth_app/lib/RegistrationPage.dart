@@ -48,7 +48,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:3000/doctors/register'), // Update this with your server URL
+        Uri.parse('https://l7xqlqhl-3000.inc1.devtunnels.ms/doctors/register'), // Update this with your server URL http://10.0.2.2:3000/doctors/register
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'email': email,

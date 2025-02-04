@@ -8,7 +8,9 @@ import 'doctor_profile_page.dart'; // Import the doctor profile page here
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final String apiUrl = 'http://10.0.2.2:3000/doctors/login'; // Update with your API URL
+  // final String apiUrl = 'http://10.0.2.2:3000/doctors/login'; // Update with your API URL
+    final String apiUrl = 'https://l7xqlqhl-3000.inc1.devtunnels.ms/doctors/login'; // Update with your API URL
+
 
   LoginPage({super.key});
 

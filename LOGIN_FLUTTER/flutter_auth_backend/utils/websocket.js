@@ -6,7 +6,7 @@ let connectedClients = [];
 const setupWebSocket = (server) => {
   const io = socketIO(server, {
     cors: {
-      origin: "http://localhost:3000", // Replace with the correct frontend URL
+      origin: "https://l7xqlqhl-3000.inc1.devtunnels.ms/", // Replace with the correct frontend URL
       methods: ["GET", "POST"],
     },
   });

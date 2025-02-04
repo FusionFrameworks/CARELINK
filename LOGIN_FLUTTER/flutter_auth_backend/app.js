@@ -9,14 +9,14 @@ const fileRoutes = require("./routes/fileRoutes");
 const labTechnicianRoutes = require("./routes/labTechnicianRoutes");
 const multer = require("multer");
 const File = require("./models/fileModel");
-
+const fs = require('fs');
 const app = express();
 
 // Middleware
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || origin === "http://localhost:3000") {
+      if (!origin || origin === "https://l7xqlqhl-3000.inc1.devtunnels.ms/") {
         callback(null, true);
       } else {
         callback(null, true);
