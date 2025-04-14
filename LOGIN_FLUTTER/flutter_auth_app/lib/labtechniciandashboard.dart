@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:file_picker/file_picker.dart';
+// import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'technician_profile.dart';
 
@@ -76,41 +76,41 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
     }
   }
 
-  Future<void> _uploadLabReport() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
-    );
+  // Future<void> _uploadLabReport() async {
+  //   FilePickerResult? result = await FilePicker.platform.pickFiles(
+  //     type: FileType.custom,
+  //     allowedExtensions: ['pdf'],
+  //   );
 
-    if (result != null) {
-      File file = File(result.files.single.path!);
-      String fileName = result.files.single.name;
+  //   if (result != null) {
+  //     File file = File(result.files.single.path!);
+  //     String fileName = result.files.single.name;
 
-      try {
-        var request = http.MultipartRequest(
-          'POST',
-          Uri.parse('https://l7xqlqhl-3000.inc1.devtunnels.ms/upload'),  //replace with ipadress to run on local
-        );
-        request.files.add(await http.MultipartFile.fromPath('labReport', file.path));
+  //     try {
+  //       var request = http.MultipartRequest(
+  //         'POST',
+  //         Uri.parse('https://l7xqlqhl-3000.inc1.devtunnels.ms/upload'),  //replace with ipadress to run on local
+  //       );
+  //       request.files.add(await http.MultipartFile.fromPath('labReport', file.path));
 
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('File "$fileName" uploaded successfully')),
-          );
-          _fetchReports(); // Refresh reports after uploading
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to upload "$fileName"')),
-          );
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error uploading "$fileName": $e')),
-        );
-      }
-    }
-  }
+  //       var response = await request.send();
+  //       if (response.statusCode == 200) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(content: Text('File "$fileName" uploaded successfully')),
+  //         );
+  //         _fetchReports(); // Refresh reports after uploading
+  //       } else {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(content: Text('Failed to upload "$fileName"')),
+  //         );
+  //       }
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Error uploading "$fileName": $e')),
+  //       );
+  //     }
+  //   }
+  // }
 
   Future<void> _deleteReport(String id) async {
     try {
@@ -152,10 +152,10 @@ class _LabTechnicianDashboardState extends State<LabTechnicianDashboard> {
       ),
       body: Column(
         children: [
-          ElevatedButton(
-            onPressed: _uploadLabReport,
-            child: const Text('Upload Lab Report'),
-          ),
+          // ElevatedButton(
+          //   onPressed: _uploadLabReport,
+          //   child: const Text('Upload Lab Report'),
+          // ),
           const SizedBox(height: 10),
           Expanded(
             child: ListView.builder(

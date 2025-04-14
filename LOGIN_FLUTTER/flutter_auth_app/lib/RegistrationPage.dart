@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:animate_do/animate_do.dart'; // For animations
 import 'login_page.dart'; // Import the LoginPage
 
 class RegistrationPage extends StatefulWidget {
+  const RegistrationPage({super.key});
+
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
 }
@@ -11,7 +14,7 @@ class RegistrationPage extends StatefulWidget {
 class _RegistrationPageState extends State<RegistrationPage> {
   final PageController _pageController = PageController();
   final _formKey1 = GlobalKey<FormState>();
-  final _formKey2 = GlobalKey<FormState>(); // New key for Step 2
+  final _formKey2 = GlobalKey<FormState>();
 
   String email = '';
   String password = '';
@@ -21,7 +24,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   String experience = '';
   String hospitalName = '';
 
-  // Controllers for text fields
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
@@ -29,81 +31,101 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController specializationController = TextEditingController();
   final TextEditingController experienceController = TextEditingController();
   final TextEditingController hospitalNameController = TextEditingController();
+  bool _isLoading = false; // Track loading state
 
- Future<void> submitRegistration() async {
-  if (_formKey2.currentState!.validate()) {
-    // Validate that passwords match
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Passwords do not match')),
-      );
-      return;
-    }
+  Future<void> submitRegistration() async {
+    if (_formKey2.currentState!.validate()) {
+      if (password != confirmPassword) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Passwords do not match'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+        return;
+      }
 
-    // Prepare data to send to the server
-    doctorName = doctorNameController.text;
-    specialization = specializationController.text;
-    experience = experienceController.text;
-    hospitalName = hospitalNameController.text;
+      doctorName = doctorNameController.text.trim();
+      specialization = specializationController.text.trim();
+      experience = experienceController.text.trim();
+      hospitalName = hospitalNameController.text.trim();
 
-    try {
-      final response = await http.post(
-        Uri.parse('https://l7xqlqhl-3000.inc1.devtunnels.ms/doctors/register'), // Update this with your server URL http://10.0.2.2:3000/doctors/register
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'email': email,
-          'password': password,
-          'doctorName': doctorName,
-          'specialization': specialization,
-          'experience': experience,
-          'hospitalName': hospitalName,
-        }),
-      );
+      setState(() {
+        _isLoading = true;
+      });
 
-      // Debugging
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      try {
+        final response = await http.post(
+          Uri.parse('http:10.0.2.2:3000/doctors/register'),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({
+            'email': email,
+            'password': password,
+            'doctorName': doctorName,
+            'specialization': specialization,
+            'experience': experience,
+            'hospitalName': hospitalName,
+          }),
+        );
 
-      // Check the response from the server
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        var jsonResponse = json.decode(response.body);
-        if (jsonResponse['message'] == "User registered successfully") {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Registration successful')),
-          );
+        print('Response status: ${response.statusCode}');
+        print('Response body: ${response.body}');
 
-          // Navigate to the Login Page after successful registration
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => LoginPage()),
-          );
+        if (response.statusCode >= 200 && response.statusCode < 300) {
+          var jsonResponse = json.decode(response.body);
+          if (jsonResponse['message'] == "User registered successfully") {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Registration successful'),
+                backgroundColor: Colors.greenAccent,
+              ),
+            );
+
+            Future.delayed(const Duration(seconds: 1), () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            });
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to register: ${jsonResponse['message']}'),
+                backgroundColor: Colors.redAccent,
+              ),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to register: ${jsonResponse['message']}')),
+            SnackBar(
+              content: Text('Server Error (${response.statusCode}): ${response.body}'),
+              backgroundColor: Colors.redAccent,
+            ),
           );
         }
-      } else {
+      } catch (e) {
+        print('Error: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to register: ${response.statusCode} - ${response.body}')),
+          const SnackBar(
+            content: Text('Error: Could not connect to server'),
+            backgroundColor: Colors.redAccent,
+          ),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
-    } catch (e) {
-      print('Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to register: $e')),
-      );
     }
   }
-}
 
   void nextPage() {
     if (_formKey1.currentState!.validate()) {
-      // Validate Step 1 form
-      email = emailController.text;
-      password = passwordController.text;
-      confirmPassword = confirmPasswordController.text;
+      email = emailController.text.trim();
+      password = passwordController.text.trim();
+      confirmPassword = confirmPasswordController.text.trim();
       _pageController.nextPage(
-        duration: Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeIn,
       );
     }
@@ -111,14 +133,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   void previousPage() {
     _pageController.previousPage(
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeIn,
     );
   }
 
   @override
   void dispose() {
-    // Dispose of the controllers to free up resources
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
@@ -126,35 +147,50 @@ class _RegistrationPageState extends State<RegistrationPage> {
     specializationController.dispose();
     experienceController.dispose();
     hospitalNameController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Doctor Registration'),
-      ),
-      body: PageView(
-        controller: _pageController,
-        children: [
-          Step1(
-            onNext: nextPage,
-            emailController: emailController,
-            passwordController: passwordController,
-            confirmPasswordController: confirmPasswordController,
-            formKey: _formKey1, // Pass the form key for Step 1
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.shade900,
+              Colors.purple.shade800,
+              Colors.black87,
+            ],
           ),
-          Step2(
-            onNext: submitRegistration,
-            onBack: previousPage,
-            doctorNameController: doctorNameController,
-            specializationController: specializationController,
-            experienceController: experienceController,
-            hospitalNameController: hospitalNameController,
-            formKey: _formKey2, // Pass the form key for Step 2
+        ),
+        child: SafeArea(
+          child: PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(), // Prevent manual swiping
+            children: [
+              Step1(
+                onNext: nextPage,
+                emailController: emailController,
+                passwordController: passwordController,
+                confirmPasswordController: confirmPasswordController,
+                formKey: _formKey1,
+              ),
+              Step2(
+                onNext: submitRegistration,
+                onBack: previousPage,
+                doctorNameController: doctorNameController,
+                specializationController: specializationController,
+                experienceController: experienceController,
+                hospitalNameController: hospitalNameController,
+                formKey: _formKey2,
+                isLoading: _isLoading,
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -165,53 +201,73 @@ class Step1 extends StatelessWidget {
   final TextEditingController emailController;
   final TextEditingController passwordController;
   final TextEditingController confirmPasswordController;
-  final GlobalKey<FormState> formKey; // Add formKey parameter
+  final GlobalKey<FormState> formKey;
 
-  Step1({
+  const Step1({
     required this.onNext,
     required this.emailController,
     required this.passwordController,
     required this.confirmPasswordController,
-    required this.formKey, // Accept formKey
+    required this.formKey,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: formKey, // Assign the form key
-        child: Column(
-          children: [
-            TextFormField(
-              controller: emailController,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
-                ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 40),
+          FadeInDown(
+            duration: const Duration(milliseconds: 800),
+            child: Text(
+              'Doctor Registration - Step 1',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: 1.5,
+                shadows: [
+                  Shadow(
+                    blurRadius: 10,
+                    color: Colors.blueAccent.withOpacity(0.5),
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
+            ),
+          ),
+          const SizedBox(height: 40),
+          FadeInLeft(
+            duration: const Duration(milliseconds: 1000),
+            child: _buildTextField(
+              controller: emailController,
+              label: 'Email',
+              icon: Icons.email,
+              keyboardType: TextInputType.emailAddress,
               validator: (value) {
-                if (value!.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Please enter your email';
+                }
+                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                  return 'Please enter a valid email';
                 }
                 return null;
               },
             ),
-            SizedBox(height: 16),
-            TextFormField(
+          ),
+          const SizedBox(height: 20),
+          FadeInRight(
+            duration: const Duration(milliseconds: 1000),
+            child: _buildTextField(
               controller: passwordController,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
-                ),
-              ),
+              label: 'Password',
+              icon: Icons.lock,
               obscureText: true,
               validator: (value) {
-                if (value!.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Please enter your password';
                 }
                 if (value.length < 8) {
@@ -220,40 +276,54 @@ class Step1 extends StatelessWidget {
                 return null;
               },
             ),
-            SizedBox(height: 16),
-            TextFormField(
+          ),
+          const SizedBox(height: 20),
+          FadeInLeft(
+            duration: const Duration(milliseconds: 1200),
+            child: _buildTextField(
               controller: confirmPasswordController,
-              decoration: InputDecoration(
-                labelText: 'Confirm Password',
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
-                ),
-              ),
+              label: 'Confirm Password',
+              icon: Icons.lock_outline,
               obscureText: true,
               validator: (value) {
-                if (value!.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Please confirm your password';
                 }
                 return null;
               },
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
+          ),
+          const SizedBox(height: 30),
+          FadeInUp(
+            duration: const Duration(milliseconds: 1400),
+            child: _buildFuturisticButton(
+              context,
+              label: 'Continue',
+              icon: Icons.arrow_forward,
+              onTap: () => onNext(),
+            ),
+          ),
+          const SizedBox(height: 20),
+          FadeInUp(
+            duration: const Duration(milliseconds: 1600),
+            child: TextButton(
               onPressed: () {
-                onNext();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 173, 221, 243), // Change to your desired color
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+              child: Text(
+                'Already have an account? Login',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.8),
+                  fontSize: 16,
+                  letterSpacing: 1,
                 ),
               ),
-              child: Text('Continue'),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -266,128 +336,263 @@ class Step2 extends StatelessWidget {
   final TextEditingController specializationController;
   final TextEditingController experienceController;
   final TextEditingController hospitalNameController;
-  final GlobalKey<FormState> formKey; // Add formKey parameter
+  final GlobalKey<FormState> formKey;
+  final bool isLoading;
 
-  Step2({
+  const Step2({
     required this.onNext,
     required this.onBack,
     required this.doctorNameController,
     required this.specializationController,
     required this.experienceController,
     required this.hospitalNameController,
-    required this.formKey, // Accept formKey
+    required this.formKey,
+    required this.isLoading,
+    super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Form(
-        key: formKey, // Assign the form key
-        child: Column(
-          children: [
-            TextFormField(
-              controller: doctorNameController,
-              decoration: InputDecoration(
-                labelText: 'Doctor Name',
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
-                ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 40),
+          FadeInDown(
+            duration: const Duration(milliseconds: 800),
+            child: Text(
+              'Doctor Registration - Step 2',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: 1.5,
+                shadows: [
+                  Shadow(
+                    blurRadius: 10,
+                    color: Colors.blueAccent.withOpacity(0.5),
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
+            ),
+          ),
+          const SizedBox(height: 40),
+          FadeInLeft(
+            duration: const Duration(milliseconds: 1000),
+            child: _buildTextField(
+              controller: doctorNameController,
+              label: 'Doctor Name',
+              icon: Icons.person,
               validator: (value) {
-                if (value!.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Please enter your name';
                 }
                 return null;
               },
             ),
-            SizedBox(height: 16),
-            TextFormField(
+          ),
+          const SizedBox(height: 20),
+          FadeInRight(
+            duration: const Duration(milliseconds: 1000),
+            child: _buildTextField(
               controller: specializationController,
-              decoration: InputDecoration(
-                labelText: 'Specialization',
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
-                ),
-              ),
+              label: 'Specialization',
+              icon: Icons.medical_services,
               validator: (value) {
-                if (value!.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Please enter your specialization';
                 }
                 return null;
               },
             ),
-            SizedBox(height: 16),
-            TextFormField(
+          ),
+          const SizedBox(height: 20),
+          FadeInLeft(
+            duration: const Duration(milliseconds: 1200),
+            child: _buildTextField(
               controller: experienceController,
-              decoration: InputDecoration(
-                labelText: 'Experience (years)',
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
-                ),
-              ),
+              label: 'Experience (years)',
+              icon: Icons.work_history,
+              keyboardType: TextInputType.number,
               validator: (value) {
-                if (value!.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Please enter your experience';
+                }
+                if (int.tryParse(value) == null || int.parse(value) < 0) {
+                  return 'Please enter a valid number';
                 }
                 return null;
               },
             ),
-            SizedBox(height: 16),
-            TextFormField(
+          ),
+          const SizedBox(height: 20),
+          FadeInRight(
+            duration: const Duration(milliseconds: 1200),
+            child: _buildTextField(
               controller: hospitalNameController,
-              decoration: InputDecoration(
-                labelText: 'Hospital Name',
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blueAccent),
-                ),
-              ),
+              label: 'Hospital Name',
+              icon: Icons.local_hospital,
               validator: (value) {
-                if (value!.isEmpty) {
+                if (value == null || value.isEmpty) {
                   return 'Please enter your hospital name';
                 }
                 return null;
               },
             ),
-            SizedBox(height: 20),
-            Row(
+          ),
+          const SizedBox(height: 30),
+          FadeInUp(
+            duration: const Duration(milliseconds: 1400),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
-                  onPressed: () {
-                    onBack(); // Call the back function
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey, // Change to your desired color
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                Expanded(
+                  child: _buildFuturisticButton(
+                    context,
+                    label: 'Back',
+                    icon: Icons.arrow_back,
+                    onTap: () => onBack(),
                   ),
-                  child: Text('Back'),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    onNext(); // Call the next function
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 173, 221, 243), // Change to your desired color
-                    padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: _buildFuturisticButton(
+                    context,
+                    label: 'Register',
+                    icon: Icons.app_registration,
+                    onTap: () => onNext(),
+                    isLoading: isLoading,
                   ),
-                  child: Text('Register'),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
+}
+
+Widget _buildTextField({
+  required TextEditingController controller,
+  required String label,
+  required IconData icon,
+  bool obscureText = false,
+  TextInputType? keyboardType,
+  String? Function(String?)? validator,
+}) {
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(15),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.2),
+          blurRadius: 10,
+          offset: const Offset(0, 5),
+        ),
+      ],
+    ),
+    child: TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      style: const TextStyle(color: Colors.white),
+      validator: validator,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.1),
+        prefixIcon: Icon(icon, color: Colors.white70),
+        labelText: label,
+        labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+        ),
+      ),
+    )
+  );
+}
+
+Widget _buildFuturisticButton(
+  BuildContext context, {
+  required String label,
+  required IconData icon,
+  required VoidCallback onTap,
+  bool isLoading = false,
+}) {
+  return GestureDetector(
+    onTap: isLoading ? null : onTap,
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      height: 60,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        gradient: LinearGradient(
+          colors: [
+            Colors.blueAccent.withOpacity(0.8),
+            Colors.purpleAccent.withOpacity(0.8),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blueAccent.withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(15),
+          onTap: isLoading ? null : onTap,
+          child: Center(
+            child: isLoading
+                ? const CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 3,
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(icon, color: Colors.white, size: 24),
+                      const SizedBox(width: 10),
+                      Text(
+                        label,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
