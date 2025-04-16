@@ -78,8 +78,6 @@ The Hospital Kiosk System was developed by the following team members:
 | Ashish Goswami   | Mobile App Developer | [GitHub](https://github.com/ashish6298)  | [LinkedIn](https://www.linkedin.com/in/ashish-goswami-58797a24a/)      |
 | Anjali P Nambiar   | UI/UX Designer     | [GitHub](https://github.com/2003anjali)    | [LinkedIn](https://www.linkedin.com/in/anjali-p-nambiar-9ab453241/)      |
 
-*Note*: Replace placeholders with actual team member details.
-
 ## Future Enhancements
 - Additional kiosk features (e.g., multilingual support, teleconsultation).
 - Enhanced chatbot capabilities with AI-driven diagnostics.
